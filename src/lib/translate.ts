@@ -1,24 +1,57 @@
 // シンプルな自動翻訳ユーティリティ
-// MyMemory翻訳API (無料・APIキー不要・1日5000文字まで) を使用
-// 短い単語（カテゴリ名・タグ名）程度ならこれで十分
+// Gemini 1.5 Flash API を使用して高精度な翻訳を行います。
 
 export type LangKey = "ja" | "en" | "zh" | "ko";
-
-const LANG_TO_MYMEMORY: Record<LangKey, string> = {
-  ja: "ja",
-  en: "en",
-  zh: "zh-CN",
-  ko: "ko",
-};
 
 export async function translateOne(text: string, from: LangKey, to: LangKey): Promise<string> {
   if (!text.trim()) return "";
   if (from === to) return text;
-  const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${LANG_TO_MYMEMORY[from]}|${LANG_TO_MYMEMORY[to]}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error("翻訳に失敗しました");
-  const data = await res.json();
-  return (data?.responseData?.translatedText as string) || "";
+
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error("Gemini API key is not configured");
+  }
+
+  const langNames: Record<LangKey, string> = {
+    ja: "Japanese",
+    en: "English",
+    zh: "Simplified Chinese",
+    ko: "Korean",
+  };
+
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  
+  // プロンプト：フォーマットを維持し、翻訳後のテキストのみを返すように指示します。
+  const prompt = `Translate the following text from ${langNames[from]} to ${langNames[to]}.
+Provide only the translated text. Do not add any introduction, explanation, markdown styling, or wrapper.
+Original text:
+${text}`;
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      contents: [
+        {
+          parts: [
+            {
+              text: prompt
+            }
+          ]
+        }
+      ]
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error("翻訳に失敗しました (Gemini API エラー)");
+  }
+
+  const data = await response.json();
+  const translated = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+  return translated?.trim() || "";
 }
 
 /**
@@ -50,3 +83,4 @@ export async function translateToAll(
   );
   return next;
 }
+
