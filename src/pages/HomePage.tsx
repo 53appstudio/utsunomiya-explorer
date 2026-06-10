@@ -4,6 +4,7 @@ import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
 import { db } from "@/firebase";
 import { Post, Category, Tag } from "@/types";
 import { useLang, pickLocalized } from "@/i18n/LanguageContext";
+import { getDemoPosts, getDemoCategories, getDemoTags } from "@/lib/demoStore";
 
 export default function HomePage() {
   const { lang, t } = useLang();
@@ -16,6 +17,9 @@ export default function HomePage() {
 
   useEffect(() => {
     if (!db) {
+      setPosts(getDemoPosts().filter((p) => p.published));
+      setCats(getDemoCategories());
+      setTags(getDemoTags());
       setLoading(false);
       return;
     }
