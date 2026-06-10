@@ -44,6 +44,7 @@ export default function AdminPostEditPage() {
   const [dragOver, setDragOver] = useState(false);
 
   useEffect(() => {
+    if (!db) return;
     (async () => {
       const [cSnap, tSnap] = await Promise.all([
         getDocs(collection(db, "categories")),
