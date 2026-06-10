@@ -8,6 +8,13 @@ import { toast } from "sonner";
 
 const empty = { name_ja: "", name_en: "", name_zh: "", name_ko: "" };
 
+const LANG_LABELS = [
+  { key: "ja" as const, label: "日本語", placeholder: "例：おすすめ" },
+  { key: "en" as const, label: "English", placeholder: "e.g. Recommended" },
+  { key: "zh" as const, label: "中文", placeholder: "例如：推荐" },
+  { key: "ko" as const, label: "한국어", placeholder: "예: 추천" },
+];
+
 export default function AdminTagsPage() {
   const { t } = useLang();
   const [items, setItems] = useState<Tag[]>([]);
@@ -50,34 +57,52 @@ export default function AdminTagsPage() {
       <Link to="/admin" className="text-sm text-muted-foreground">← {t("back")}</Link>
       <h1 className="text-xl font-bold my-3">{t("manageTags")}</h1>
 
-      <div className="border rounded-lg p-3 mb-6 space-y-2">
+      {/* 追加フォーム */}
+      <div className="border rounded-lg p-4 mb-6 space-y-3">
         <h2 className="font-semibold text-sm">{t("add")}</h2>
-        <div className="grid grid-cols-2 gap-2">
-          {(["ja", "en", "zh", "ko"] as const).map((l) => (
-            <input key={l} placeholder={`name_${l}`} value={(draft as any)[`name_${l}`]} onChange={(e) => setDraft({ ...draft, [`name_${l}`]: e.target.value })} className="border rounded px-2 py-1 text-sm" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {LANG_LABELS.map((l) => (
+            <div key={l.key} className="space-y-1">
+              <label className="text-xs font-medium text-muted-foreground">{l.label}</label>
+              <input
+                placeholder={l.placeholder}
+                value={(draft as any)[`name_${l.key}`]}
+                onChange={(e) => setDraft({ ...draft, [`name_${l.key}`]: e.target.value })}
+                className="border rounded px-3 py-2 text-sm w-full"
+              />
+            </div>
           ))}
         </div>
-        <button onClick={add} className="bg-primary text-primary-foreground px-3 py-1.5 rounded text-sm">{t("add")}</button>
+        <button onClick={add} className="bg-primary text-primary-foreground px-4 py-2 rounded text-sm">{t("add")}</button>
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      {/* 一覧 */}
+      <div className="flex flex-wrap gap-3">
         {items.map((tg) => (
-          <div key={tg.id} className="border rounded-lg p-2 text-sm">
+          <div key={tg.id} className="border rounded-lg p-3 text-sm">
             {editing === tg.id ? (
-              <div className="space-y-1">
-                <div className="grid grid-cols-2 gap-1">
-                  {(["ja", "en", "zh", "ko"] as const).map((l) => (
-                    <input key={l} value={(editDraft as any)[`name_${l}`]} onChange={(e) => setEditDraft({ ...editDraft, [`name_${l}`]: e.target.value })} className="border rounded px-1 py-0.5 text-xs w-24" />
+              <div className="space-y-2 min-w-[260px]">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {LANG_LABELS.map((l) => (
+                    <div key={l.key} className="space-y-1">
+                      <label className="text-[10px] font-medium text-muted-foreground">{l.label}</label>
+                      <input
+                        value={(editDraft as any)[`name_${l.key}`]}
+                        onChange={(e) => setEditDraft({ ...editDraft, [`name_${l.key}`]: e.target.value })}
+                        className="border rounded px-2 py-1 text-xs w-full"
+                      />
+                    </div>
                   ))}
                 </div>
-                <div className="flex gap-1">
-                  <button onClick={() => save(tg.id)} className="bg-primary text-primary-foreground px-2 py-0.5 rounded text-xs">{t("save")}</button>
-                  <button onClick={() => setEditing(null)} className="border px-2 py-0.5 rounded text-xs">{t("cancel")}</button>
+                <div className="flex gap-2">
+                  <button onClick={() => save(tg.id)} className="bg-primary text-primary-foreground px-3 py-1 rounded text-xs">{t("save")}</button>
+                  <button onClick={() => setEditing(null)} className="border px-3 py-1 rounded text-xs">{t("cancel")}</button>
                 </div>
               </div>
             ) : (
-              <div className="flex items-center gap-2">
-                <span>{tg.name_ja} / {tg.name_en} / {tg.name_zh} / {tg.name_ko}</span>
+              <div className="flex items-center gap-3">
+                <span className="font-medium">{tg.name_ja}</span>
+                <span className="text-xs text-muted-foreground">{tg.name_en} / {tg.name_zh} / {tg.name_ko}</span>
                 <button onClick={() => { setEditing(tg.id); setEditDraft({ name_ja: tg.name_ja, name_en: tg.name_en, name_zh: tg.name_zh, name_ko: tg.name_ko }); }} className="text-xs underline">{t("edit")}</button>
                 <button onClick={() => remove(tg.id)} className="text-xs text-red-600 underline">{t("delete")}</button>
               </div>
