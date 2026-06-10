@@ -30,6 +30,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/post/:id" element={<PostDetailPage />} />
+          <Route path="/admin/post/:id" element={<PostDetailPage />} />
           <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route path="/admin" element={<RequireAdmin><AdminDashboardPage /></RequireAdmin>} />
           <Route path="/admin/categories" element={<RequireAdmin><AdminCategoriesPage /></RequireAdmin>} />
