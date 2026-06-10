@@ -1,16 +1,24 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { onAuthStateChanged, User, signOut as fbSignOut } from "firebase/auth";
 import { doc, getDoc, getDocs, collection, setDoc, serverTimestamp } from "firebase/firestore";
-import { auth, db } from "@/firebase";
+import { auth, db, isFirebaseConfigured } from "@/firebase";
 
 interface AuthCtx {
   user: User | null;
   isAdmin: boolean;
   loading: boolean;
+  isDemo: boolean;
   signOut: () => Promise<void>;
 }
 
 const Ctx = createContext<AuthCtx | null>(null);
+
+/** Fake user object used when Firebase is not configured, so the admin UI can be previewed. */
+const DEMO_USER = {
+  uid: "demo-admin",
+  email: "demo@preview.local",
+  displayName: "Demo Admin",
+} as unknown as User;
 
 /** Ensure the first user who ever signs up is registered as an admin. */
 export async function ensureAdminOnFirstUser(uid: string) {
@@ -23,9 +31,10 @@ export async function ensureAdminOnFirstUser(uid: string) {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const isDemo = !isFirebaseConfigured;
+  const [user, setUser] = useState<User | null>(isDemo ? DEMO_USER : null);
+  const [isAdmin, setIsAdmin] = useState(isDemo);
+  const [loading, setLoading] = useState(!isDemo);
 
   useEffect(() => {
     if (!auth) {
@@ -53,7 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (auth) await fbSignOut(auth);
   };
 
-  return <Ctx.Provider value={{ user, isAdmin, loading, signOut }}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={{ user, isAdmin, loading, isDemo, signOut }}>{children}</Ctx.Provider>;
 }
 
 export function useAuth() {
