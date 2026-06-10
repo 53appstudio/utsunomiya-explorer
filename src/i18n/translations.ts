@@ -1,0 +1,85 @@
+export type Lang = "ja" | "en" | "zh" | "ko";
+
+export const LANG_LABELS: Record<Lang, string> = {
+  ja: "日本語",
+  en: "English",
+  zh: "中文",
+  ko: "한국어",
+};
+
+const dict = {
+  siteTitle: {
+    ja: "宇都宮観光ガイド",
+    en: "Utsunomiya Tourism Guide",
+    zh: "宇都宫观光指南",
+    ko: "우츠노미야 관광 가이드",
+  },
+  home: { ja: "ホーム", en: "Home", zh: "首页", ko: "홈" },
+  admin: { ja: "管理", en: "Admin", zh: "管理", ko: "관리" },
+  login: { ja: "ログイン", en: "Sign in", zh: "登录", ko: "로그인" },
+  logout: { ja: "ログアウト", en: "Sign out", zh: "退出", ko: "로그아웃" },
+  email: { ja: "メール", en: "Email", zh: "邮箱", ko: "이메일" },
+  password: { ja: "パスワード", en: "Password", zh: "密码", ko: "비밀번호" },
+  signup: { ja: "新規登録", en: "Sign up", zh: "注册", ko: "회원가입" },
+  category: { ja: "カテゴリー", en: "Category", zh: "分类", ko: "카테고리" },
+  categories: { ja: "カテゴリー", en: "Categories", zh: "分类", ko: "카테고리" },
+  tag: { ja: "タグ", en: "Tag", zh: "标签", ko: "태그" },
+  tags: { ja: "タグ", en: "Tags", zh: "标签", ko: "태그" },
+  posts: { ja: "記事", en: "Posts", zh: "文章", ko: "게시물" },
+  newPost: { ja: "新規記事", en: "New post", zh: "新文章", ko: "새 게시물" },
+  edit: { ja: "編集", en: "Edit", zh: "编辑", ko: "편집" },
+  delete: { ja: "削除", en: "Delete", zh: "删除", ko: "삭제" },
+  save: { ja: "保存", en: "Save", zh: "保存", ko: "저장" },
+  cancel: { ja: "キャンセル", en: "Cancel", zh: "取消", ko: "취소" },
+  title: { ja: "タイトル", en: "Title", zh: "标题", ko: "제목" },
+  body: { ja: "本文", en: "Body", zh: "正文", ko: "본문" },
+  name: { ja: "名前", en: "Name", zh: "名称", ko: "이름" },
+  sortOrder: { ja: "並び順", en: "Sort order", zh: "排序", ko: "정렬 순서" },
+  published: { ja: "公開", en: "Published", zh: "已发布", ko: "공개" },
+  draft: { ja: "下書き", en: "Draft", zh: "草稿", ko: "초안" },
+  images: { ja: "画像", en: "Images", zh: "图片", ko: "이미지" },
+  uploadImages: {
+    ja: "画像をアップロード（最大20枚）",
+    en: "Upload images (max 20)",
+    zh: "上传图片（最多20张）",
+    ko: "이미지 업로드 (최대 20장)",
+  },
+  dragHere: { ja: "ここにドラッグ＆ドロップ", en: "Drag & drop here", zh: "拖放到此处", ko: "여기로 드래그 앤 드롭" },
+  filter: { ja: "絞り込み", en: "Filter", zh: "筛选", ko: "필터" },
+  all: { ja: "すべて", en: "All", zh: "全部", ko: "전체" },
+  newest: { ja: "新着順", en: "Newest", zh: "最新", ko: "최신순" },
+  noResults: { ja: "記事がありません", en: "No posts yet", zh: "暂无文章", ko: "게시물이 없습니다" },
+  loading: { ja: "読み込み中...", en: "Loading...", zh: "加载中...", ko: "불러오는 중..." },
+  back: { ja: "戻る", en: "Back", zh: "返回", ko: "뒤로" },
+  required: { ja: "必須", en: "Required", zh: "必填", ko: "필수" },
+  manageCategories: { ja: "カテゴリー管理", en: "Manage categories", zh: "管理分类", ko: "카테고리 관리" },
+  manageTags: { ja: "タグ管理", en: "Manage tags", zh: "管理标签", ko: "태그 관리" },
+  managePosts: { ja: "記事管理", en: "Manage posts", zh: "管理文章", ko: "게시물 관리" },
+  add: { ja: "追加", en: "Add", zh: "添加", ko: "추가" },
+  confirmDelete: { ja: "削除してよろしいですか？", en: "Are you sure to delete?", zh: "确定要删除吗？", ko: "삭제하시겠습니까?" },
+  saved: { ja: "保存しました", en: "Saved", zh: "已保存", ko: "저장되었습니다" },
+  deleted: { ja: "削除しました", en: "Deleted", zh: "已删除", ko: "삭제되었습니다" },
+  maxImagesError: {
+    ja: "画像は最大20枚までです",
+    en: "Maximum 20 images allowed",
+    zh: "最多只能上传20张图片",
+    ko: "이미지는 최대 20장까지입니다",
+  },
+  selectCategory: { ja: "カテゴリーを選択", en: "Select category", zh: "选择分类", ko: "카테고리 선택" },
+  notFound: { ja: "ページが見つかりません", en: "Page not found", zh: "未找到页面", ko: "페이지를 찾을 수 없습니다" },
+  firstUserAdmin: {
+    ja: "最初のサインアップユーザーが管理者になります",
+    en: "The first user to sign up becomes the admin",
+    zh: "首位注册用户将成为管理员",
+    ko: "처음 가입한 사용자가 관리자가 됩니다",
+  },
+} as const;
+
+export type TKey = keyof typeof dict;
+
+export const translations: Record<Lang, Record<TKey, string>> = {
+  ja: Object.fromEntries(Object.entries(dict).map(([k, v]) => [k, v.ja])) as Record<TKey, string>,
+  en: Object.fromEntries(Object.entries(dict).map(([k, v]) => [k, v.en])) as Record<TKey, string>,
+  zh: Object.fromEntries(Object.entries(dict).map(([k, v]) => [k, v.zh])) as Record<TKey, string>,
+  ko: Object.fromEntries(Object.entries(dict).map(([k, v]) => [k, v.ko])) as Record<TKey, string>,
+};
