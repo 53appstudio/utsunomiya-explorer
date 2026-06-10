@@ -20,6 +20,10 @@ export default function AdminLoginPage() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (!auth) {
+      toast.error("Firebase not configured");
+      return;
+    }
     setSubmitting(true);
     try {
       if (mode === "signup") {
