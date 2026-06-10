@@ -4,6 +4,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/firebase";
 import { Post } from "@/types";
 import { useLang, pickLocalized } from "@/i18n/LanguageContext";
+import { getDemoPost } from "@/lib/demoStore";
 
 export default function PostDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -15,9 +16,6 @@ export default function PostDetailPage() {
   useEffect(() => {
     if (!id) return;
     if (!db) {
-      // Demo mode — read from seeded localStorage
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { getDemoPost } = require("@/lib/demoStore");
       setPost(getDemoPost(id));
       setLoading(false);
       return;
