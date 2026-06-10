@@ -9,6 +9,7 @@ import { Post, Category, Tag, PostImage } from "@/types";
 import { useLang } from "@/i18n/LanguageContext";
 import { LANG_LABELS, Lang } from "@/i18n/translations";
 import { toast } from "sonner";
+import { translateOne } from "@/lib/translate";
 
 const LANGS: Lang[] = ["ja", "en", "zh", "ko"];
 const MAX_IMAGES = 20;
@@ -40,6 +41,7 @@ export default function AdminPostEditPage() {
   const [postId, setPostId] = useState<string | null>(id ?? null);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [translating, setTranslating] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
 
@@ -68,6 +70,51 @@ export default function AdminPostEditPage() {
       }
     })();
   }, [id]);
+
+  async function handleAutoTranslate() {
+    const sourceLang = activeLang;
+    const sourceTitle = form[`title_${sourceLang}`];
+    const sourceBody = form[`body_${sourceLang}`];
+
+    if (!sourceTitle.trim() && !sourceBody.trim()) {
+      toast.error("翻訳元（現在の言語）のタイトルまたは本文を入力してください。");
+      return;
+    }
+
+    setTranslating(true);
+    try {
+      const targetLangs = LANGS.filter((l) => l !== sourceLang);
+      const updatedForm = { ...form } as any;
+
+      await Promise.all(
+        targetLangs.map(async (lang) => {
+          // タイトルの翻訳
+          if (sourceTitle.trim()) {
+            try {
+              updatedForm[`title_${lang}`] = await translateOne(sourceTitle, sourceLang, lang);
+            } catch (e) {
+              console.error(`Title translation failed for ${lang}`, e);
+            }
+          }
+          // 本文の翻訳
+          if (sourceBody.trim()) {
+            try {
+              updatedForm[`body_${lang}`] = await translateOne(sourceBody, sourceLang, lang);
+            } catch (e) {
+              console.error(`Body translation failed for ${lang}`, e);
+            }
+          }
+        })
+      );
+
+      setForm(updatedForm);
+      toast.success("自動翻訳が完了しました！");
+    } catch (error) {
+      toast.error("自動翻訳中にエラーが発生しました。");
+    } finally {
+      setTranslating(false);
+    }
+  }
 
   /** Make sure a post doc exists (so we can upload images under its ID). */
   async function ensurePostId(): Promise<string> {
@@ -168,12 +215,22 @@ export default function AdminPostEditPage() {
       <h1 className="text-xl font-bold">{isNew ? t("newPost") : t("edit")}</h1>
 
       <div className="border rounded-lg p-3">
-        <div className="flex gap-1 mb-3 border-b">
-          {LANGS.map((l) => (
-            <button key={l} onClick={() => setActiveLang(l)} className={"px-3 py-1.5 text-sm -mb-px border-b-2 " + (activeLang === l ? "border-primary font-semibold" : "border-transparent text-muted-foreground")}>
-              {LANG_LABELS[l]}
-            </button>
-          ))}
+        <div className="flex gap-1 mb-3 border-b items-center justify-between">
+          <div className="flex gap-1">
+            {LANGS.map((l) => (
+              <button key={l} type="button" onClick={() => setActiveLang(l)} className={"px-3 py-1.5 text-sm -mb-px border-b-2 " + (activeLang === l ? "border-primary font-semibold" : "border-transparent text-muted-foreground")}>
+                {LANG_LABELS[l]}
+              </button>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={handleAutoTranslate}
+            disabled={translating}
+            className="text-xs bg-secondary hover:bg-secondary/80 text-secondary-foreground px-2.5 py-1.5 rounded-full font-medium transition-colors disabled:opacity-50 flex items-center gap-1"
+          >
+            {translating ? "翻訳中..." : `🌐 ${LANG_LABELS[activeLang]}から他言語へ自動翻訳`}
+          </button>
         </div>
         <div className="space-y-2">
           <label className="text-sm">{t("title")} ({activeLang})</label>
