@@ -19,7 +19,7 @@ export async function translateOne(text: string, from: LangKey, to: LangKey): Pr
     ko: "Korean",
   };
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
   
   // プロンプト：フォーマットを維持し、翻訳後のテキストのみを返すように指示します。
   const prompt = `Translate the following text from ${langNames[from]} to ${langNames[to]}.
