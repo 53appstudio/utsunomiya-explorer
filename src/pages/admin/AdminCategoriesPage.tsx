@@ -22,6 +22,26 @@ export default function AdminCategoriesPage() {
   const [draft, setDraft] = useState({ ...empty });
   const [editing, setEditing] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState({ ...empty });
+  const [translating, setTranslating] = useState<null | "add" | "edit">(null);
+
+  async function autoTranslate(target: "add" | "edit", source: LangKey) {
+    const current = target === "add" ? draft : editDraft;
+    if (!(current as any)[`name_${source}`]?.trim()) {
+      toast.error("先に翻訳元の単語を入力してください");
+      return;
+    }
+    setTranslating(target);
+    try {
+      const next = await translateToAll(current as any, source, { overwrite: true });
+      if (target === "add") setDraft({ ...current, ...next });
+      else setEditDraft({ ...current, ...next });
+      toast.success("自動翻訳しました");
+    } catch {
+      toast.error("翻訳に失敗しました");
+    } finally {
+      setTranslating(null);
+    }
+  }
 
   async function load() {
     if (!db) return;
