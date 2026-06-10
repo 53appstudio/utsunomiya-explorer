@@ -14,6 +14,7 @@ const Ctx = createContext<AuthCtx | null>(null);
 
 /** Ensure the first user who ever signs up is registered as an admin. */
 export async function ensureAdminOnFirstUser(uid: string) {
+  if (!db) return;
   const adminsRef = collection(db, "admins");
   const snap = await getDocs(adminsRef);
   if (snap.empty) {
@@ -27,9 +28,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!auth) {
+      setLoading(false);
+      return;
+    }
     const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u);
-      if (u) {
+      if (u && db) {
         try {
           const adminDoc = await getDoc(doc(db, "admins", u.uid));
           setIsAdmin(adminDoc.exists());
@@ -45,7 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = async () => {
-    await fbSignOut(auth);
+    if (auth) await fbSignOut(auth);
   };
 
   return <Ctx.Provider value={{ user, isAdmin, loading, signOut }}>{children}</Ctx.Provider>;
@@ -56,3 +61,4 @@ export function useAuth() {
   if (!ctx) throw new Error("useAuth must be inside AuthProvider");
   return ctx;
 }
+
