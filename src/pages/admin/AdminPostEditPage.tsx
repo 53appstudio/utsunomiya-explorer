@@ -85,6 +85,7 @@ export default function AdminPostEditPage() {
     try {
       const targetLangs = LANGS.filter((l) => l !== sourceLang);
       const updatedForm = { ...form } as any;
+      const errors: string[] = [];
 
       await Promise.all(
         targetLangs.map(async (lang) => {
@@ -92,25 +93,31 @@ export default function AdminPostEditPage() {
           if (sourceTitle.trim()) {
             try {
               updatedForm[`title_${lang}`] = await translateOne(sourceTitle, sourceLang, lang);
-            } catch (e) {
+            } catch (e: any) {
               console.error(`Title translation failed for ${lang}`, e);
+              errors.push(`${LANG_LABELS[lang]}のタイトル: ${e.message || e}`);
             }
           }
           // 本文の翻訳
           if (sourceBody.trim()) {
             try {
               updatedForm[`body_${lang}`] = await translateOne(sourceBody, sourceLang, lang);
-            } catch (e) {
+            } catch (e: any) {
               console.error(`Body translation failed for ${lang}`, e);
+              errors.push(`${LANG_LABELS[lang]}の本文: ${e.message || e}`);
             }
           }
         })
       );
 
       setForm(updatedForm);
-      toast.success("自動翻訳が完了しました！");
-    } catch (error) {
-      toast.error("自動翻訳中にエラーが発生しました。");
+      if (errors.length > 0) {
+        toast.error(`翻訳エラーが発生しました:\n` + errors.join(", "));
+      } else {
+        toast.success("自動翻訳が完了しました！");
+      }
+    } catch (error: any) {
+      toast.error("自動翻訳中にエラーが発生しました: " + (error.message || error));
     } finally {
       setTranslating(false);
     }
