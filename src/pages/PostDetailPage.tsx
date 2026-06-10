@@ -21,8 +21,16 @@ export default function PostDetailPage() {
       return;
     }
     (async () => {
-      const snap = await getDoc(doc(db, "posts", id));
-      if (snap.exists()) setPost({ id: snap.id, ...snap.data() } as Post);
+      try {
+        const snap = await getDoc(doc(db, "posts", id));
+        if (snap.exists()) {
+          setPost({ id: snap.id, ...snap.data() } as Post);
+        } else {
+          setPost(getDemoPost(id));
+        }
+      } catch {
+        setPost(getDemoPost(id));
+      }
       setLoading(false);
     })();
   }, [id]);
