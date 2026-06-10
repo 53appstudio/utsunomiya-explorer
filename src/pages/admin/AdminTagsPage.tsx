@@ -5,6 +5,7 @@ import { db } from "@/firebase";
 import { Tag } from "@/types";
 import { useLang } from "@/i18n/LanguageContext";
 import { toast } from "sonner";
+import { translateToAll, LangKey } from "@/lib/translate";
 
 const empty = { name_ja: "", name_en: "", name_zh: "", name_ko: "" };
 
