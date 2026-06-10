@@ -135,6 +135,10 @@ export default function AdminPostEditPage() {
   }
 
   async function save() {
+    if (!db) {
+      toast.error("Firebase not configured");
+      return;
+    }
     setSaving(true);
     try {
       const payload: any = {
