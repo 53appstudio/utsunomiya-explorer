@@ -7,7 +7,7 @@ export function Footer() {
   const { user, isAdmin } = useAuth();
   return (
     <footer className="mt-12 border-t border-border/60 bg-card/40">
-      <div className="max-w-5urn-5xl max-w-5xl mx-auto px-4 py-6 flex flex-col sm:flex-row gap-3 items-center justify-between text-sm text-muted-foreground">
+      <div className="max-w-5xl mx-auto px-4 py-6 flex flex-col sm:flex-row gap-3 items-center justify-between text-sm text-muted-foreground">
         <div className="flex items-center gap-2">
           <span>🌸</span>
           <span>© {new Date().getFullYear()} {t("siteTitle")}</span>
