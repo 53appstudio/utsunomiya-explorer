@@ -16,12 +16,14 @@ export default function AdminTagsPage() {
   const [editDraft, setEditDraft] = useState({ ...empty });
 
   async function load() {
+    if (!db) return;
     const snap = await getDocs(collection(db, "tags"));
     setItems(snap.docs.map((d) => ({ id: d.id, ...d.data() } as Tag)));
   }
   useEffect(() => { load(); }, []);
 
   async function add() {
+    if (!db) return;
     if (!draft.name_ja) return;
     await addDoc(collection(db, "tags"), draft);
     setDraft({ ...empty });
@@ -29,12 +31,14 @@ export default function AdminTagsPage() {
     load();
   }
   async function save(id: string) {
+    if (!db) return;
     await updateDoc(doc(db, "tags", id), editDraft);
     setEditing(null);
     toast.success(t("saved"));
     load();
   }
   async function remove(id: string) {
+    if (!db) return;
     if (!confirm(t("confirmDelete"))) return;
     await deleteDoc(doc(db, "tags", id));
     toast.success(t("deleted"));

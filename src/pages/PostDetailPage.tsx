@@ -13,7 +13,7 @@ export default function PostDetailPage() {
   const [idx, setIdx] = useState(0);
 
   useEffect(() => {
-    if (!id) return;
+    if (!db || !id) return;
     (async () => {
       const snap = await getDoc(doc(db, "posts", id));
       if (snap.exists()) setPost({ id: snap.id, ...snap.data() } as Post);

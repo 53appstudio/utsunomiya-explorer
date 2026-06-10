@@ -16,12 +16,14 @@ export default function AdminCategoriesPage() {
   const [editDraft, setEditDraft] = useState({ ...empty });
 
   async function load() {
+    if (!db) return;
     const snap = await getDocs(query(collection(db, "categories"), orderBy("sort_order", "asc")));
     setItems(snap.docs.map((d) => ({ id: d.id, ...d.data() } as Category)));
   }
   useEffect(() => { load(); }, []);
 
   async function add() {
+    if (!db) return;
     if (!draft.name_ja) return;
     await addDoc(collection(db, "categories"), { ...draft, sort_order: Number(draft.sort_order) || 0 });
     setDraft({ ...empty });
@@ -29,12 +31,14 @@ export default function AdminCategoriesPage() {
     load();
   }
   async function save(id: string) {
+    if (!db) return;
     await updateDoc(doc(db, "categories", id), { ...editDraft, sort_order: Number(editDraft.sort_order) || 0 });
     setEditing(null);
     toast.success(t("saved"));
     load();
   }
   async function remove(id: string) {
+    if (!db) return;
     if (!confirm(t("confirmDelete"))) return;
     await deleteDoc(doc(db, "categories", id));
     toast.success(t("deleted"));

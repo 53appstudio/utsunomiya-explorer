@@ -44,6 +44,7 @@ export default function AdminPostEditPage() {
   const [dragOver, setDragOver] = useState(false);
 
   useEffect(() => {
+    if (!db) return;
     (async () => {
       const [cSnap, tSnap] = await Promise.all([
         getDocs(collection(db, "categories")),
@@ -70,6 +71,7 @@ export default function AdminPostEditPage() {
 
   /** Make sure a post doc exists (so we can upload images under its ID). */
   async function ensurePostId(): Promise<string> {
+    if (!db) throw new Error("Firebase not configured");
     if (postId) return postId;
     const ref = await addDoc(collection(db, "posts"), {
       ...form,
@@ -81,6 +83,10 @@ export default function AdminPostEditPage() {
   }
 
   async function handleFiles(files: FileList | File[]) {
+    if (!storage || !db) {
+      toast.error("Firebase not configured");
+      return;
+    }
     const arr = Array.from(files);
     if (form.images.length + arr.length > MAX_IMAGES) {
       toast.error(t("maxImagesError"));
@@ -106,6 +112,7 @@ export default function AdminPostEditPage() {
   }
 
   async function removeImage(idx: number) {
+    if (!storage) return;
     const img = form.images[idx];
     try { await deleteObject(ref(storage, img.path)); } catch {}
     const next = form.images.filter((_, i) => i !== idx).map((im, i) => ({ ...im, sortOrder: i }));
@@ -128,6 +135,10 @@ export default function AdminPostEditPage() {
   }
 
   async function save() {
+    if (!db) {
+      toast.error("Firebase not configured");
+      return;
+    }
     setSaving(true);
     try {
       const payload: any = {

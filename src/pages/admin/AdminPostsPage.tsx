@@ -12,16 +12,20 @@ export default function AdminPostsPage() {
   const [items, setItems] = useState<Post[]>([]);
 
   async function load() {
+    if (!db) return;
     const snap = await getDocs(query(collection(db, "posts"), orderBy("created_at", "desc")));
     setItems(snap.docs.map((d) => ({ id: d.id, ...d.data() } as Post)));
   }
   useEffect(() => { load(); }, []);
 
   async function remove(p: Post) {
+    if (!db) return;
     if (!confirm(t("confirmDelete"))) return;
     // Delete images from storage
-    for (const img of p.images ?? []) {
-      try { await deleteObject(ref(storage, img.path)); } catch {}
+    if (storage) {
+      for (const img of p.images ?? []) {
+        try { await deleteObject(ref(storage, img.path)); } catch {}
+      }
     }
     await deleteDoc(doc(db, "posts", p.id));
     toast.success(t("deleted"));

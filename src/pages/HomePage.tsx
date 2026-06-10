@@ -15,6 +15,10 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!db) {
+      setLoading(false);
+      return;
+    }
     (async () => {
       try {
         const [pSnap, cSnap, tSnap] = await Promise.all([
