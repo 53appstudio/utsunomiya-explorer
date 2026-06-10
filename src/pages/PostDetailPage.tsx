@@ -13,7 +13,15 @@ export default function PostDetailPage() {
   const [idx, setIdx] = useState(0);
 
   useEffect(() => {
-    if (!db || !id) return;
+    if (!id) return;
+    if (!db) {
+      // Demo mode — read from seeded localStorage
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { getDemoPost } = require("@/lib/demoStore");
+      setPost(getDemoPost(id));
+      setLoading(false);
+      return;
+    }
     (async () => {
       const snap = await getDoc(doc(db, "posts", id));
       if (snap.exists()) setPost({ id: snap.id, ...snap.data() } as Post);
