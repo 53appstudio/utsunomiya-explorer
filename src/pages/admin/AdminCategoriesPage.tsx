@@ -128,7 +128,17 @@ export default function AdminCategoriesPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {LANG_LABELS.map((l) => (
                     <div key={l.key} className="space-y-1">
-                      <label className="text-xs font-medium text-muted-foreground">{l.label}</label>
+                      <div className="flex items-center justify-between gap-2">
+                        <label className="text-xs font-medium text-muted-foreground">{l.label}</label>
+                        <button
+                          type="button"
+                          onClick={() => autoTranslate("edit", l.key)}
+                          disabled={translating !== null}
+                          className="text-[10px] text-primary underline disabled:opacity-50"
+                        >
+                          {translating === "edit" ? "翻訳中…" : "🌐 他言語へ自動翻訳"}
+                        </button>
+                      </div>
                       <input
                         value={(editDraft as any)[`name_${l.key}`]}
                         onChange={(e) => setEditDraft({ ...editDraft, [`name_${l.key}`]: e.target.value })}
