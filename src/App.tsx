@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Header } from "./components/Header";
+import { Footer } from "./components/Footer";
 import { useAuth } from "./auth/AuthContext";
 import { useLang } from "./i18n/LanguageContext";
 
@@ -39,6 +40,7 @@ export default function App() {
           <Route path="*" element={<div className="p-8 text-center">404</div>} />
         </Routes>
       </main>
+      <Footer />
     </div>
   );
 }

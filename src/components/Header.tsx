@@ -10,15 +10,18 @@ export function Header() {
   const { user, isAdmin, signOut } = useAuth();
 
   return (
-    <header className="border-b bg-background sticky top-0 z-30">
-      <div className="max-w-5xl mx-auto px-3 py-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+    <header className="sticky top-0 z-30 backdrop-blur-md bg-background/80 border-b border-border/60">
+      <div className="max-w-5xl mx-auto px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center justify-between gap-3">
-          <Link to="/" className="font-bold text-lg truncate">
-            {t("siteTitle")}
+          <Link to="/" className="flex items-center gap-2 font-display font-bold text-lg sm:text-xl">
+            <span className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-gradient-primary text-primary-foreground shadow-soft text-base">
+              🌸
+            </span>
+            <span className="truncate">{t("siteTitle")}</span>
           </Link>
           <nav className="flex items-center gap-3 text-sm">
             {isAdmin && (
-              <Link to="/admin" className="text-muted-foreground hover:text-foreground">
+              <Link to="/admin" className="px-3 py-1 rounded-full bg-secondary/60 text-secondary-foreground hover:bg-secondary transition">
                 {t("admin")}
               </Link>
             )}
@@ -29,18 +32,18 @@ export function Header() {
             ) : null}
           </nav>
         </div>
-        <div className="flex gap-1 flex-wrap">
+        <div className="flex gap-1.5 flex-wrap">
           {LANGS.map((l) => (
             <button
               key={l}
               onClick={() => setLang(l)}
-              className={
-                "px-2.5 py-1 text-xs sm:text-sm rounded-md border transition " +
-                (lang === l
-                  ? "bg-primary text-primary-foreground border-primary font-semibold"
-                  : "bg-background text-foreground hover:bg-muted")
-              }
               aria-pressed={lang === l}
+              className={
+                "px-3 py-1.5 text-xs sm:text-sm rounded-full border transition-all " +
+                (lang === l
+                  ? "bg-gradient-primary text-primary-foreground border-transparent font-semibold shadow-soft scale-105"
+                  : "bg-card text-foreground border-border hover:bg-accent hover:border-primary/30")
+              }
             >
               {LANG_LABELS[l]}
             </button>
