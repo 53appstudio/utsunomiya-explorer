@@ -5,6 +5,7 @@ import { db } from "@/firebase";
 import { Category } from "@/types";
 import { useLang } from "@/i18n/LanguageContext";
 import { toast } from "sonner";
+import { translateToAll, LangKey } from "@/lib/translate";
 
 const empty = { name_ja: "", name_en: "", name_zh: "", name_ko: "", sort_order: 0 };
 
@@ -21,6 +22,26 @@ export default function AdminCategoriesPage() {
   const [draft, setDraft] = useState({ ...empty });
   const [editing, setEditing] = useState<string | null>(null);
   const [editDraft, setEditDraft] = useState({ ...empty });
+  const [translating, setTranslating] = useState<null | "add" | "edit">(null);
+
+  async function autoTranslate(target: "add" | "edit", source: LangKey) {
+    const current = target === "add" ? draft : editDraft;
+    if (!(current as any)[`name_${source}`]?.trim()) {
+      toast.error("先に翻訳元の単語を入力してください");
+      return;
+    }
+    setTranslating(target);
+    try {
+      const next = await translateToAll(current as any, source, { overwrite: true });
+      if (target === "add") setDraft({ ...current, ...next });
+      else setEditDraft({ ...current, ...next });
+      toast.success("自動翻訳しました");
+    } catch {
+      toast.error("翻訳に失敗しました");
+    } finally {
+      setTranslating(null);
+    }
+  }
 
   async function load() {
     if (!db) return;
@@ -63,7 +84,18 @@ export default function AdminCategoriesPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {LANG_LABELS.map((l) => (
             <div key={l.key} className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground">{l.label}</label>
+              <div className="flex items-center justify-between gap-2">
+                <label className="text-xs font-medium text-muted-foreground">{l.label}</label>
+                <button
+                  type="button"
+                  onClick={() => autoTranslate("add", l.key)}
+                  disabled={translating !== null}
+                  className="text-[10px] text-primary underline disabled:opacity-50"
+                  title={`${l.label}の入力を元に他の3言語へ自動翻訳`}
+                >
+                  {translating === "add" ? "翻訳中…" : "🌐 他言語へ自動翻訳"}
+                </button>
+              </div>
               <input
                 placeholder={l.placeholder}
                 value={(draft as any)[`name_${l.key}`]}
@@ -96,7 +128,17 @@ export default function AdminCategoriesPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {LANG_LABELS.map((l) => (
                     <div key={l.key} className="space-y-1">
-                      <label className="text-xs font-medium text-muted-foreground">{l.label}</label>
+                      <div className="flex items-center justify-between gap-2">
+                        <label className="text-xs font-medium text-muted-foreground">{l.label}</label>
+                        <button
+                          type="button"
+                          onClick={() => autoTranslate("edit", l.key)}
+                          disabled={translating !== null}
+                          className="text-[10px] text-primary underline disabled:opacity-50"
+                        >
+                          {translating === "edit" ? "翻訳中…" : "🌐 他言語へ自動翻訳"}
+                        </button>
+                      </div>
                       <input
                         value={(editDraft as any)[`name_${l.key}`]}
                         onChange={(e) => setEditDraft({ ...editDraft, [`name_${l.key}`]: e.target.value })}
