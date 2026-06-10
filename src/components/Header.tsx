@@ -7,9 +7,15 @@ const LANGS: Lang[] = ["ja", "en", "zh", "ko"];
 
 export function Header() {
   const { lang, setLang, t } = useLang();
-  const { user, isAdmin, signOut } = useAuth();
+  const { user, isAdmin, isDemo, signOut } = useAuth();
 
   return (
+    <>
+    {isDemo && (
+      <div className="bg-gradient-primary text-primary-foreground text-xs text-center py-1.5 px-4">
+        🧪 デモモード: Firebase未設定のため、管理画面UIを自由に確認できます（保存はできません）
+      </div>
+    )}
     <header className="sticky top-0 z-30 backdrop-blur-md bg-background/80 border-b border-border/60">
       <div className="max-w-5xl mx-auto px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center justify-between gap-3">
@@ -51,5 +57,6 @@ export function Header() {
         </div>
       </div>
     </header>
+    </>
   );
 }
