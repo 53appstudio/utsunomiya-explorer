@@ -51,22 +51,34 @@ export default function AdminCategoriesPage() {
   useEffect(() => { load(); }, []);
 
   async function add() {
-    if (!db) return;
-    if (!draft.name_ja) return;
+    if (!draft.name_ja) {
+      toast.error("日本語名を入力してください");
+      return;
+    }
+    if (!db) {
+      toast.error("デモモードのため保存できません（Firebase未設定）");
+      return;
+    }
     await addDoc(collection(db, "categories"), { ...draft, sort_order: Number(draft.sort_order) || 0 });
     setDraft({ ...empty });
     toast.success(t("saved"));
     load();
   }
   async function save(id: string) {
-    if (!db) return;
+    if (!db) {
+      toast.error("デモモードのため保存できません（Firebase未設定）");
+      return;
+    }
     await updateDoc(doc(db, "categories", id), { ...editDraft, sort_order: Number(editDraft.sort_order) || 0 });
     setEditing(null);
     toast.success(t("saved"));
     load();
   }
   async function remove(id: string) {
-    if (!db) return;
+    if (!db) {
+      toast.error("デモモードのため削除できません（Firebase未設定）");
+      return;
+    }
     if (!confirm(t("confirmDelete"))) return;
     await deleteDoc(doc(db, "categories", id));
     toast.success(t("deleted"));
